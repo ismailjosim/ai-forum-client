@@ -1,11 +1,5 @@
-import HeroSection from './HeroSection'
-
-const HomePage = () => {
-	return (
-		<div>
-			<HeroSection />
-		</div>
-	)
+const Homepage = () => {
+	return <div>this is home page</div>
 }
 
-export default HomePage
+export default Homepage

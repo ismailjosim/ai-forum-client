@@ -1,14 +1,15 @@
-import React from 'react'
-import PublicNavbar from '@/components/shared/PublicNavbar'
-import PublicFooter from '@/components/shared/PublicFooter'
+import { AppSidebar } from '../../components/shared/AppSideBar'
+import { SidebarProvider, SidebarTrigger } from '../../components/ui/sidebar'
 
 const CommonLayout = ({ children }: { children: React.ReactNode }) => {
 	return (
-		<>
-			<PublicNavbar />
-			<main className='min-h-screen'>{children}</main>
-			<PublicFooter />
-		</>
+		<SidebarProvider>
+			<AppSidebar />
+			<main>
+				<SidebarTrigger />
+				{children}
+			</main>
+		</SidebarProvider>
 	)
 }
 

@@ -14,9 +14,12 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-	title: 'WellSpace - Connecting Care, Anytime, Anywhere',
+	title: 'ConverseAI - AI Forum Application',
 	description:
-		'WellSpace brings healthcare to the digital age. With real-time video consultations, seamless scheduling, and secure medical record management, we make staying healthy easier than ever before.',
+		'An interactive AI-powered forum where users can share ideas, ask questions, and connect with the community seamlessly.',
+	icons: {
+		icon: '/logo.png',
+	},
 }
 
 export default function RootLayout({

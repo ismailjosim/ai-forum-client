@@ -1,11 +1,5 @@
-import HeartbeatLoader from '@/components/shared/Loader'
-
 const Loading = () => {
-	return (
-		<>
-			<HeartbeatLoader />
-		</>
-	)
+	return <h3>Page is Loading...</h3>
 }
 
 export default Loading
