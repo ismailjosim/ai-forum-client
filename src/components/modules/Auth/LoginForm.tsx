@@ -110,18 +110,13 @@ const LoginForm = () => {
 			<Card className='w-full max-w-md shadow-2xl'>
 				<CardHeader className='text-center space-y-4'>
 					<div className='flex items-center justify-center space-x-2'>
-						<div className='w-8 h-8 bg-primary rounded-full flex items-center justify-center'>
-							<HeartHandshake className='w-5 h-5 text-primary-foreground' />
-						</div>
-						<CardTitle className='text-3xl font-extrabold text-secondary'>
-							WellSpace
+						<CardTitle className='text-3xl font-extrabold '>
+							Welcome Back
 						</CardTitle>
 					</div>
 					<div>
-						<CardTitle className='text-xl'>Welcome Back</CardTitle>
-						<CardDescription className='mt-1'>
-							Sign in to access your WellSpace dashboard.
-						</CardDescription>
+						<CardTitle className='text-xl'>ConverseAI</CardTitle>
+						<CardDescription className='mt-1'></CardDescription>
 					</div>
 				</CardHeader>
 
