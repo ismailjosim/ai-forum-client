@@ -10,6 +10,7 @@ import {
 	SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import { Home, MessageCircle, User, Shield } from 'lucide-react'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const items = [
@@ -61,7 +62,7 @@ export function AppSidebar() {
 								return (
 									<SidebarMenuItem key={item.title}>
 										<SidebarMenuButton asChild>
-											<a
+											<Link
 												href={item.url}
 												className={`flex items-center space-x-3 p-3 rounded-xl transition-colors font-medium ${
 													isActive
@@ -71,7 +72,7 @@ export function AppSidebar() {
 											>
 												<item.icon className='w-5 h-5' />
 												<span>{item.title}</span>
-											</a>
+											</Link>
 										</SidebarMenuButton>
 									</SidebarMenuItem>
 								)
