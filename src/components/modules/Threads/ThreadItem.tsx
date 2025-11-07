@@ -4,8 +4,8 @@ import Link from 'next/link'
 export interface ThreadItemProps {
 	_id: string
 	title: string
-	category: 'HOT' | 'AI' | 'CLOSED'
-	color: 'indigo' | 'green' | 'gray'
+	category: string
+	color?: 'indigo' | 'green' | 'gray'
 	description: string
 	author: string
 	replies: number
@@ -14,45 +14,45 @@ export interface ThreadItemProps {
 }
 
 export function ThreadItem({
+	_id,
 	title,
 	category,
-	color,
+	color = 'gray',
 	description,
 	author,
 	replies,
 	views,
 	updated,
-	_id,
 }: ThreadItemProps) {
-	const colorMap = {
-		indigo: 'bg-indigo-500 ring-indigo-500 text-indigo-600',
-		green: 'bg-green-500 ring-green-500 text-green-600',
-		gray: 'bg-gray-500 ring-gray-500 text-gray-600',
+	const colorMap: Record<string, string> = {
+		indigo: 'bg-indigo-500 text-indigo-600 ring-indigo-500',
+		green: 'bg-green-500 text-green-600 ring-green-500',
+		gray: 'bg-gray-500 text-gray-600 ring-gray-500',
 	}
+
+	const selectedColor = colorMap[color] || colorMap.gray
 
 	return (
 		<Link
 			href={`/threads/${_id}`}
-			className={`block hover:shadow-xl transition duration-300 hover:ring-2 rounded-xl ${
-				colorMap[color].split(' ')[1]
-			}`}
+			className='block transition duration-300 hover:shadow-xl hover:ring-2 hover:ring-gray-200 rounded-xl'
 		>
 			<Card className='overflow-hidden rounded-xl border border-gray-100'>
 				<CardContent className='p-6'>
-					<div className='flex justify-between items-start'>
-						<h4 className='text-xl font-bold text-gray-900 mr-4'>{title}</h4>
+					<div className='flex justify-between items-start flex-wrap gap-2'>
+						<h4 className='text-xl font-bold text-gray-900'>{title}</h4>
 						<span
-							className={`text-sm font-semibold text-white px-3 py-1 rounded-full shrink-0 ${
-								colorMap[color].split(' ')[0]
+							className={`text-sm font-semibold text-white px-3 py-1 rounded-full ${
+								selectedColor.split(' ')[0]
 							}`}
 						>
-							{category}
+							{category?.toUpperCase() || 'GENERAL'}
 						</span>
 					</div>
 
 					<p className='text-gray-600 mt-2 line-clamp-2'>{description}</p>
 
-					<div className='flex justify-between items-center text-sm mt-4 pt-4 border-t border-gray-100'>
+					<div className='flex justify-between items-center text-sm mt-4 pt-4 border-t border-gray-100 flex-wrap gap-2'>
 						<div className='space-x-4'>
 							<span className='text-gray-500'>
 								Author:{' '}

@@ -1,21 +1,33 @@
-export interface Post {
-	id: number
-	author: string
-	time: string
-	content: string
-	flagged?: boolean
-	color?: 'indigo' | 'green' | 'red' | 'gray'
-	isAuthor?: boolean
-	votes?: number
-	replies?: Post[]
+export interface ThreadResponse {
+	statusCode: number
+	success: boolean
+	message: string
+	data: {
+		thread: Thread
+		threadPost: Post[]
+	}
 }
 
-export interface ThreadData {
+export interface Thread {
 	_id: string
 	title: string
-	author: string
-	date: string
+	content: string
 	category: string
-	summary: string
-	posts: Post[]
+	author: string
+	tags: string[]
+	views: number
+	createdAt: string
+	updatedAt: string
+}
+
+export interface Post {
+	_id: string
+	content: string
+	author: string
+	thread: string
+	parentPost: string | null
+	likes: string[]
+	createdAt: string
+	updatedAt: string
+	replies: Post[]
 }
