@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import ThreadPost from './ThreadPost'
 import CommentList from './CommentList'
 import { ThreadResponse } from '../../../types/types'
+import CommentInput from './CommentInput'
 
 interface SingleThreadProps {
 	id: string
@@ -67,6 +68,9 @@ const SingleThread = ({ id }: SingleThreadProps) => {
 						activeReplyId={activeReplyId}
 						setActiveReplyId={setActiveReplyId}
 					/>
+					<div className=''>
+						<CommentInput threadId={singleThread.data.thread._id} />
+					</div>
 				</section>
 			</main>
 		</div>

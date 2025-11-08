@@ -1,4 +1,5 @@
 import SingleThread from '@/components/modules/SingleThread/SingleThread'
+import { getServerSession } from 'next-auth'
 
 interface SingleThreadPageProps {
 	params: Promise<{

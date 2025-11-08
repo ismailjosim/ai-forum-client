@@ -1,123 +1,117 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useActionState, useState } from 'react'
 import Link from 'next/link'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import z from 'zod'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from '@/components/ui/form'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 
-import { toast } from 'sonner'
 import { loginUser } from '@/utility/actions/login'
+import { Eye, EyeOff, LogIn } from 'lucide-react'
+import { Field, FieldDescription, FieldGroup, FieldLabel } from '../../ui/field'
+import { Separator } from '../../ui/separator'
 
-const loginSchema = z.object({
-	email: z.string().email({ message: 'Please enter a valid email address.' }),
-	password: z
-		.string()
-		.min(6, { message: 'Password must be at least 6 characters long.' }),
-})
+const LoginForm = ({ redirect }: { redirect?: string }) => {
+	const [state, formAction, isPending] = useActionState(loginUser, null)
+	const [showPassword, setShowPassword] = useState(false)
 
-type LoginFormValues = z.infer<typeof loginSchema>
-
-const LoginForm = () => {
-	const searchParams = useSearchParams()
-	const callbackUrl = searchParams.get('callbackUrl') || '/'
-	const router = useRouter()
-	const [error, setError] = useState('')
-	const [isLoading, setIsLoading] = useState(false)
-
-	const form = useForm<LoginFormValues>({
-		resolver: zodResolver(loginSchema),
-		defaultValues: { email: '', password: '' },
-	})
-
-	const handleSubmit = async (data: LoginFormValues) => {
-		setError('')
-		setIsLoading(true)
-
-		try {
-			const result = await loginUser(data)
-
-			console.log('Login successful:', result)
-			if (result.data.accessToken) {
-				// Successful login
-				localStorage.setItem('accessToken', result.data.accessToken)
-				router.push(callbackUrl)
-			} else {
-				console.error('Login failed:', result.message)
-			}
-		} catch (err) {
-			setError('Invalid email or password.')
-			toast.error('Login failed')
-		} finally {
-			setIsLoading(false)
+	const getFieldError = (fieldName: string) => {
+		if (state && state.errors) {
+			const error = state.errors.find((err: any) => err.field === fieldName)
+			return error?.message || null
 		}
+		return null
 	}
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-4'>
-				{/* Email */}
-				<FormField
-					control={form.control}
-					name='email'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Email</FormLabel>
-							<FormControl>
-								<Input type='email' placeholder='you@example.com' {...field} />
-							</FormControl>
-							<FormMessage className='text-red-500 font-medium' />
-						</FormItem>
+		<form action={formAction}>
+			{redirect && <input type='hidden' name='redirect' value={redirect} />}
+			<FieldGroup>
+				<Field>
+					<FieldLabel htmlFor='email'>Email Address</FieldLabel>
+					<Input
+						defaultValue={'super@wellspace.com'}
+						id='email'
+						name='email'
+						type='email'
+						placeholder='your@email.com'
+						required
+					/>
+					{getFieldError('email') && (
+						<FieldDescription className='text-red-500'>
+							{getFieldError('email')}
+						</FieldDescription>
 					)}
-				/>
+				</Field>
 
-				{/* Password */}
-				<FormField
-					control={form.control}
-					name='password'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Password</FormLabel>
-							<FormControl>
-								<Input type='password' placeholder='••••••••' {...field} />
-							</FormControl>
-							<FormMessage className='text-red-500 font-medium' />
-						</FormItem>
+				<Field>
+					<div className='flex items-center'>
+						<FieldLabel htmlFor='password'>Password</FieldLabel>
+						<a
+							href='#'
+							className='ml-auto inline-block text-sm underline-offset-4 hover:underline'
+						>
+							Forgot your password?
+						</a>
+					</div>
+					<div className='relative'>
+						<Input
+							defaultValue={'123456'}
+							id='password'
+							name='password'
+							type={showPassword ? 'text' : 'password'}
+							placeholder='••••••••'
+							required
+						/>
+						<button
+							type='button'
+							onClick={() => setShowPassword(!showPassword)}
+							className='absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors'
+							aria-label={showPassword ? 'Hide password' : 'Show password'}
+						>
+							{showPassword ? (
+								<EyeOff className='h-5 w-5' />
+							) : (
+								<Eye className='h-5 w-5' />
+							)}
+						</button>
+					</div>
+					{getFieldError('password') && (
+						<FieldDescription className='text-red-500'>
+							{getFieldError('password')}
+						</FieldDescription>
 					)}
-				/>
+				</Field>
 
-				{/* General error */}
-				{error && (
-					<Alert variant='destructive'>
-						<AlertDescription>{error}</AlertDescription>
-					</Alert>
-				)}
-
-				<Button type='submit' className='w-full' disabled={isLoading}>
-					{isLoading ? 'Signing In...' : 'Login'}
-				</Button>
-
-				<div className='text-center text-sm'>
-					Don&apos;t have an account?{' '}
-					<Link href='/register' className='text-blue-600 hover:underline'>
-						Register
-					</Link>
-				</div>
-			</form>
-		</Form>
+				<Field>
+					<Button type='submit' className='w-full' disabled={isPending}>
+						{isPending ? 'Signing In...' : 'Sign In'}
+						<LogIn className='w-4 h-4 ml-2' />
+					</Button>
+					{/* Divider */}
+					<div className='flex items-center gap-4 my-6'>
+						<Separator className='flex-1' />
+						<span className='text-sm font-medium text-muted-foreground'>
+							OR
+						</span>
+						<Separator className='flex-1' />
+					</div>
+					<Button variant='outline' type='button' className='w-full'>
+						Login with Google
+					</Button>
+					<FieldDescription className='text-center'>
+						Don&apos;t have an account?{' '}
+						<Link
+							href='/register'
+							className='underline-offset-4 hover:underline'
+						>
+							Register
+						</Link>
+					</FieldDescription>
+				</Field>
+			</FieldGroup>
+		</form>
 	)
 }
 

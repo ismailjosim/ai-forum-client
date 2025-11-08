@@ -26,33 +26,20 @@ const LoginPage = () => {
 							Sign in to continue your conversation
 						</CardDescription>
 					</div>
-				</CardHeader>
-
-				<CardContent>
-					{/* Login Form */}
-					<LoginForm />
-
+					{/* Google Sign Up Button */}
+					<SocialSignup />
 					{/* Divider */}
-					<div className='flex items-center gap-4 my-6'>
+					<div className='flex items-center gap-4'>
 						<Separator className='flex-1' />
 						<span className='text-sm font-medium text-muted-foreground'>
 							OR
 						</span>
 						<Separator className='flex-1' />
 					</div>
+				</CardHeader>
 
-					{/* Social Login */}
-					<SocialSignup />
-
-					{/* Register Link */}
-					<div className='mt-6 text-center'>
-						<Link
-							href='/register'
-							className='text-sm text-muted-foreground hover:text-primary-dark transition duration-300 font-medium'
-						>
-							Don&apos;t have an account? Register Here
-						</Link>
-					</div>
+				<CardContent>
+					<LoginForm />
 				</CardContent>
 			</Card>
 		</div>

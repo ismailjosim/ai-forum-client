@@ -27,31 +27,21 @@ const RegisterPage = () => {
 						</CardTitle>
 						<CardDescription className='mt-1'></CardDescription>
 					</div>
-				</CardHeader>
 
-				<CardContent>
-					{/* Register Form */}
-					<RegisterForm />
+					{/* Google Sign Up Button */}
+					<SocialSignup />
 					{/* Divider */}
-					<div className='flex items-center gap-4 my-6'>
+					<div className='flex items-center gap-4'>
 						<Separator className='flex-1' />
 						<span className='text-sm font-medium text-muted-foreground'>
 							OR
 						</span>
 						<Separator className='flex-1' />
 					</div>
-					{/* Google Sign Up Button */}
-					<SocialSignup />
+				</CardHeader>
 
-					{/* Login Link */}
-					<div className='mt-6 text-center'>
-						<Link
-							href='/login'
-							className='text-sm text-muted-foreground hover:text-primary-dark transition duration-300 font-medium'
-						>
-							Already have an account? Sign In
-						</Link>
-					</div>
+				<CardContent>
+					<RegisterForm />
 				</CardContent>
 			</Card>
 		</div>

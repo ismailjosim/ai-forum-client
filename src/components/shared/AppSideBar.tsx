@@ -9,44 +9,37 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import { Home, MessageCircle, User, Shield, LogOut } from 'lucide-react'
+import { MessageCircle, User, Shield, LogOut } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
 import { CardTitle } from '../ui/card'
-import { Session } from 'next-auth'
 import { Button } from '../ui/button'
-import { signOut } from 'next-auth/react'
 
 const items = [
-	{
-		title: 'Threads',
-		url: '/',
-		icon: MessageCircle,
-	},
-	{
-		title: 'Profile',
-		url: '/profile',
-		icon: User,
-	},
-	{
-		title: 'Admin Tools',
-		url: '/tools',
-		icon: Shield,
-		color: 'text-red-400',
-	},
+	{ title: 'Threads', url: '/', icon: MessageCircle },
+	{ title: 'Profile', url: '/profile', icon: User },
+	{ title: 'Admin Tools', url: '/tools', icon: Shield, color: 'text-red-400' },
 ]
 
-interface NavbarProps {
-	session: Session | null
+export interface User {
+	_id: string
+	name: string
+	email: string
+	picture: string | null
+	role: 'USER' | 'ADMIN' | string
+	isActive: 'ACTIVE' | 'INACTIVE' | string
+	isDeleted: boolean
+	isVerified: boolean
+	createdAt: string
+	updatedAt: string
 }
 
-export function AppSidebar({ session }: NavbarProps) {
-	const pathname = usePathname()
+interface userResponse {
+	success: boolean
+	statusCode: number
+	data: User
+}
 
-	const handleLogout = async () => {
-		await signOut({ callbackUrl: '/login' })
-	}
-
+export function AppSidebar() {
 	return (
 		<Sidebar className='bg-[#0B1221] text-white w-64 flex flex-col border-r border-gray-800 shadow-lg h-screen'>
 			{/* Header */}
@@ -62,17 +55,12 @@ export function AppSidebar({ session }: NavbarProps) {
 					<SidebarGroupContent>
 						<SidebarMenu className='space-y-2'>
 							{items.map((item) => {
-								const isActive = pathname === item.url
 								return (
 									<SidebarMenuItem key={item.title}>
 										<SidebarMenuButton asChild>
 											<Link
 												href={item.url}
-												className={`flex items-center space-x-3 p-3 rounded-xl transition-colors font-medium ${
-													isActive
-														? 'bg-indigo-600 text-white shadow-lg font-semibold'
-														: 'hover:bg-gray-800 text-gray-300'
-												} ${item.color || ''}`}
+												className={`flex items-center space-x-3 p-3 rounded-xl transition-colors font-medium `}
 											>
 												<item.icon className='w-5 h-5' />
 												<span>{item.title}</span>
@@ -88,31 +76,22 @@ export function AppSidebar({ session }: NavbarProps) {
 
 			{/* Footer */}
 			<div className='mt-auto p-4 border-t border-gray-800 text-xs text-gray-400'>
-				{session ? (
-					<>
-						<p className='font-semibold text-gray-300'>
-							User:{' '}
-							<span className='text-white'>
-								{session.user?.name || 'Unknown'}
-							</span>
-						</p>
-						<p className='text-gray-500 truncate mt-1'>
-							Email:{' '}
-							<span className='text-gray-400'>
-								{session.user?.email || '--'}
-							</span>
-						</p>
-						<Button
-							onClick={handleLogout}
-							variant='ghost'
-							className='w-full mt-3 text-gray-300 hover:text-red-400 flex items-center justify-center gap-2 text-sm'
-						>
-							<LogOut className='w-4 h-4' />
-							Log out
-						</Button>
-					</>
-				) : (
-					<>
+				<p className='font-semibold text-gray-300'>
+					User: <span className='text-white'>Person Name</span>
+				</p>
+				<p className='text-gray-500 truncate mt-1'>
+					Email: <span className='text-gray-400'>example@gmail.com</span>
+				</p>
+				<Button
+					// onClick={handleLogout}
+					variant='ghost'
+					className='w-full mt-3 text-gray-300 hover:text-red-400 flex items-center justify-center gap-2 text-sm'
+				>
+					<LogOut className='w-4 h-4' />
+					Log out
+				</Button>
+
+				{/* <>
 						<p>
 							Status: <span className='text-yellow-400'>Not signed in</span>
 						</p>
@@ -123,8 +102,7 @@ export function AppSidebar({ session }: NavbarProps) {
 						>
 							<Link href='/login'>Login</Link>
 						</Button>
-					</>
-				)}
+					</> */}
 			</div>
 		</Sidebar>
 	)

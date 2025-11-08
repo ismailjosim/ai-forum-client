@@ -15,8 +15,19 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 
+import { toast } from 'sonner'
+import { createThread } from '../../../utility/actions/thread'
+
+export interface ThreadData {
+	title: string
+	content: string
+	category: string
+	author: string
+}
+
 export function NewThreadButton() {
 	const [open, setOpen] = useState(false)
+	const [isLoading, setIsLoading] = useState(false)
 	const [formData, setFormData] = useState({
 		title: '',
 		category: '',
@@ -29,11 +40,33 @@ export function NewThreadButton() {
 		setFormData({ ...formData, [e.target.name]: e.target.value })
 	}
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
-		console.log('🧵 New Thread Data:', formData)
-		setOpen(false)
-		setFormData({ title: '', category: '', description: '' })
+		setIsLoading(true)
+
+		const threadPayload: ThreadData = {
+			title: formData.title,
+			content: formData.description,
+			category: formData.category,
+			author: '690b67298a164a65224b83b3',
+		}
+
+		try {
+			const result = await createThread(threadPayload)
+
+			if (result.success) {
+				toast.success('Thread created successfully!')
+				setOpen(false) // close modal on success
+				setFormData({ title: '', category: '', description: '' })
+			} else {
+				toast.error(result.message || 'Failed to create thread.')
+			}
+		} catch (err) {
+			console.error('Error creating thread:', err)
+			toast.error('Something went wrong. Please try again.')
+		} finally {
+			setIsLoading(false)
+		}
 	}
 
 	return (
@@ -91,8 +124,9 @@ export function NewThreadButton() {
 						<Button
 							type='submit'
 							className='w-full bg-green-500 hover:bg-green-600 text-white'
+							disabled={isLoading}
 						>
-							Submit
+							{isLoading ? 'Creating...' : 'Submit'}
 						</Button>
 					</DialogFooter>
 				</form>
