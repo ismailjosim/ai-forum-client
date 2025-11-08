@@ -1,5 +1,4 @@
-import SingleThread from '@/components/modules/SingleThread/SingleThread'
-import { getServerSession } from 'next-auth'
+import { SingleThreadWrapper } from '@/components/modules/SingleThread/SingleThreadWrapper'
 
 interface SingleThreadPageProps {
 	params: Promise<{
@@ -10,7 +9,7 @@ interface SingleThreadPageProps {
 const SingleThreadPage = async ({ params }: SingleThreadPageProps) => {
 	const { slug } = await params
 
-	return <SingleThread id={slug} />
+	return <SingleThreadWrapper id={slug} />
 }
 
 export default SingleThreadPage
