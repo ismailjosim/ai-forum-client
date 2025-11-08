@@ -1,18 +1,18 @@
-const loginUser = async (email: string, password: string) => {
+const loginUser = async (data: { email: string; password: string }) => {
 	try {
-		const res = await fetch(`${process.env.NEXT_PUBLIC_API_KEY}/auth/login`, {
+		const res = await fetch(`${process.env.BACKEND_URL}/auth/login`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({ email, password }),
+			body: JSON.stringify(data),
 			credentials: 'include',
 		})
 		if (!res.ok) {
 			throw new Error('login failed')
 		}
-		const data = await res.json()
-		return data
+		const result = await res.json()
+		return result
 	} catch (error) {
 		throw new Error(String(error))
 	}

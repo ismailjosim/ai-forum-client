@@ -40,13 +40,13 @@ const CommentItem = ({
 							level > 0 ? '007bff' : '50009c'
 						}/FFFFFF?text=${comment.author.slice(0, 2).toUpperCase()}`}
 						alt={comment.author}
-						className='w-10 h-10 rounded-full object-cover flex-shrink-0'
+						className='w-10 h-10 rounded-full object-cover shrink-0'
 					/>
 					<div className='flex-1 min-w-0'>
 						<p className='font-semibold text-card-foreground'>
 							{comment.author}
 						</p>
-						<p className='text-muted-foreground mt-1 break-words'>
+						<p className='text-muted-foreground mt-1 wrap-break-word'>
 							{comment.content}
 						</p>
 

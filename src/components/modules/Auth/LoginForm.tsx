@@ -18,7 +18,7 @@ import {
 	CardTitle,
 } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import loginUser from '@/utility/login'
+import loginUser from '@/utility/actions/login'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import checkAuthStatus from '../../../utility/checkAuthStatus'
