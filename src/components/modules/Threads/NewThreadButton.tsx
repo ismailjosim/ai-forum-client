@@ -16,7 +16,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 
 import { toast } from 'sonner'
-import { createThread } from '../../../utility/actions/thread'
+import { createThread } from '../../../services/thread/thread'
 
 export interface ThreadData {
 	title: string

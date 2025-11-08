@@ -23,7 +23,7 @@ import z from 'zod'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { registerUser } from '@/utility/actions/register'
+import { registerUser } from '@/services/auth/register'
 
 const registerSchema = z
 	.object({

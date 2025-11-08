@@ -1,6 +1,6 @@
 'use server'
 
-import { ThreadData } from '../../components/modules/Threads/NewThreadButton'
+import { ThreadData } from '@/components/modules/Threads/NewThreadButton'
 
 export const createThread = async (data: ThreadData) => {
 	console.log(data)

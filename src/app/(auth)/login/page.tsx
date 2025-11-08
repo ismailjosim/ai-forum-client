@@ -26,16 +26,6 @@ const LoginPage = () => {
 							Sign in to continue your conversation
 						</CardDescription>
 					</div>
-					{/* Google Sign Up Button */}
-					<SocialSignup />
-					{/* Divider */}
-					<div className='flex items-center gap-4'>
-						<Separator className='flex-1' />
-						<span className='text-sm font-medium text-muted-foreground'>
-							OR
-						</span>
-						<Separator className='flex-1' />
-					</div>
 				</CardHeader>
 
 				<CardContent>

@@ -7,10 +7,9 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
-import { loginUser } from '@/utility/actions/login'
+import { loginUser } from '@/services/auth/login'
 import { Eye, EyeOff, LogIn } from 'lucide-react'
 import { Field, FieldDescription, FieldGroup, FieldLabel } from '../../ui/field'
-import { Separator } from '../../ui/separator'
 
 const LoginForm = ({ redirect }: { redirect?: string }) => {
 	const [state, formAction, isPending] = useActionState(loginUser, null)
@@ -31,12 +30,10 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
 				<Field>
 					<FieldLabel htmlFor='email'>Email Address</FieldLabel>
 					<Input
-						defaultValue={'super@wellspace.com'}
-						id='email'
+						defaultValue={'demo@user.com'}
 						name='email'
 						type='email'
 						placeholder='your@email.com'
-						required
 					/>
 					{getFieldError('email') && (
 						<FieldDescription className='text-red-500'>
@@ -57,12 +54,10 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
 					</div>
 					<div className='relative'>
 						<Input
-							defaultValue={'123456'}
-							id='password'
+							defaultValue={'12345678Aa@'}
 							name='password'
 							type={showPassword ? 'text' : 'password'}
 							placeholder='••••••••'
-							required
 						/>
 						<button
 							type='button'
@@ -89,17 +84,7 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
 						{isPending ? 'Signing In...' : 'Sign In'}
 						<LogIn className='w-4 h-4 ml-2' />
 					</Button>
-					{/* Divider */}
-					<div className='flex items-center gap-4 my-6'>
-						<Separator className='flex-1' />
-						<span className='text-sm font-medium text-muted-foreground'>
-							OR
-						</span>
-						<Separator className='flex-1' />
-					</div>
-					<Button variant='outline' type='button' className='w-full'>
-						Login with Google
-					</Button>
+
 					<FieldDescription className='text-center'>
 						Don&apos;t have an account?{' '}
 						<Link
