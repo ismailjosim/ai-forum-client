@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import {
@@ -14,24 +14,34 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select'
 import { toast } from 'sonner'
-import { createThread } from '../../../services/thread/thread'
+import { createThread, ThreadData } from '@/services/thread/thread'
+import { useRouter } from 'next/navigation'
 
-export interface ThreadData {
-	title: string
-	content: string
-	category: string
-	author: string
+export enum ThreadCategory {
+	General = 'general',
+	Technology = 'technology',
+	Science = 'science',
+	Entertainment = 'entertainment',
+	Sports = 'sports',
+	Other = 'other',
 }
 
 export function NewThreadButton() {
+	const router = useRouter()
 	const [open, setOpen] = useState(false)
-	const [isLoading, setIsLoading] = useState(false)
+	const [isPending, startTransition] = useTransition()
 	const [formData, setFormData] = useState({
 		title: '',
 		category: '',
-		description: '',
+		content: '',
 	})
 
 	const handleChange = (
@@ -40,33 +50,41 @@ export function NewThreadButton() {
 		setFormData({ ...formData, [e.target.name]: e.target.value })
 	}
 
+	const handleCategoryChange = (value: string) => {
+		setFormData({ ...formData, category: value })
+	}
+
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
-		setIsLoading(true)
+
+		if (!formData.category) {
+			toast.error('Please select a category')
+			return
+		}
 
 		const threadPayload: ThreadData = {
 			title: formData.title,
-			content: formData.description,
+			content: formData.content,
 			category: formData.category,
-			author: '690b67298a164a65224b83b3',
 		}
 
-		try {
-			const result = await createThread(threadPayload)
+		startTransition(async () => {
+			try {
+				const result = await createThread(threadPayload)
 
-			if (result.success) {
-				toast.success('Thread created successfully!')
-				setOpen(false) // close modal on success
-				setFormData({ title: '', category: '', description: '' })
-			} else {
-				toast.error(result.message || 'Failed to create thread.')
+				if (result.success) {
+					toast.success('Thread created successfully!')
+					setOpen(false)
+					setFormData({ title: '', category: '', content: '' })
+					router.refresh()
+				} else {
+					toast.error(result.error || 'Failed to create thread.')
+				}
+			} catch (err) {
+				console.error('Error creating thread:', err)
+				toast.error('Something went wrong. Please try again.')
 			}
-		} catch (err) {
-			console.error('Error creating thread:', err)
-			toast.error('Something went wrong. Please try again.')
-		} finally {
-			setIsLoading(false)
-		}
+		})
 	}
 
 	return (
@@ -93,40 +111,63 @@ export function NewThreadButton() {
 							onChange={handleChange}
 							placeholder='Enter thread title'
 							required
+							disabled={isPending}
 						/>
 					</div>
 
 					<div>
 						<Label htmlFor='category'>Category</Label>
-						<Input
-							id='category'
-							name='category'
+						<Select
 							value={formData.category}
-							onChange={handleChange}
-							placeholder='e.g. AI, HOT, CLOSED'
-							required
-						/>
+							onValueChange={handleCategoryChange}
+							disabled={isPending}
+						>
+							<SelectTrigger className='w-full bg-white  border-gray-300 '>
+								<SelectValue placeholder='Select a category' />
+							</SelectTrigger>
+							<SelectContent className='bg-white  border-gray-300 '>
+								{Object.entries(ThreadCategory).map(([key, value]) => (
+									<SelectItem
+										key={value}
+										value={value}
+										className='cursor-pointer hover:bg-gray-100 '
+									>
+										{key}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
 					</div>
 
 					<div>
-						<Label htmlFor='description'>Description</Label>
+						<Label htmlFor='content'>Content</Label>
 						<Textarea
-							id='description'
-							name='description'
-							value={formData.description}
+							id='content'
+							name='content'
+							value={formData.content}
 							onChange={handleChange}
-							placeholder='Write a short description...'
+							placeholder='Write your thread content...'
+							rows={5}
 							required
+							disabled={isPending}
 						/>
 					</div>
 
 					<DialogFooter>
 						<Button
-							type='submit'
-							className='w-full bg-green-500 hover:bg-green-600 text-white'
-							disabled={isLoading}
+							type='button'
+							variant='outline'
+							onClick={() => setOpen(false)}
+							disabled={isPending}
 						>
-							{isLoading ? 'Creating...' : 'Submit'}
+							Cancel
+						</Button>
+						<Button
+							type='submit'
+							className='bg-green-500 hover:bg-green-600 text-white'
+							disabled={isPending}
+						>
+							{isPending ? 'Creating...' : 'Create Thread'}
 						</Button>
 					</DialogFooter>
 				</form>
