@@ -67,6 +67,7 @@ const RegisterForm = () => {
 	const handleSubmit = async (data: RegisterFormValues) => {
 		try {
 			const result = await registerUser(data)
+			console.log(result)
 			if (result.success) {
 				router.push('/login')
 			} else {
@@ -90,7 +91,7 @@ const RegisterForm = () => {
 							<FormControl>
 								<Input type='text' placeholder='John Doe' {...field} />
 							</FormControl>
-							<FormMessage />
+							<FormMessage className='text-red-500 font-medium' />
 						</FormItem>
 					)}
 				/>
@@ -105,7 +106,7 @@ const RegisterForm = () => {
 							<FormControl>
 								<Input type='email' placeholder='you@example.com' {...field} />
 							</FormControl>
-							<FormMessage />
+							<FormMessage className='text-red-500 font-medium' />
 						</FormItem>
 					)}
 				/>
@@ -120,7 +121,7 @@ const RegisterForm = () => {
 							<FormControl>
 								<Input type='password' placeholder='••••••••' {...field} />
 							</FormControl>
-							<FormMessage />
+							<FormMessage className='text-red-500 font-medium' />
 						</FormItem>
 					)}
 				/>
@@ -135,7 +136,7 @@ const RegisterForm = () => {
 							<FormControl>
 								<Input type='password' placeholder='••••••••' {...field} />
 							</FormControl>
-							<FormMessage />
+							<FormMessage className='text-red-500 font-medium' />
 						</FormItem>
 					)}
 				/>

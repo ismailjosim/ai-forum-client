@@ -1,8 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use server'
 
-export const registerUser = async (data: any) => {
-	const res = await fetch(`${process.env.BACKEND_URL}/register`, {
+import { UserData } from '@/components/modules/Auth/RegisterForm'
+
+export const registerUser = async (data: UserData) => {
+	console.log(data)
+	const res = await fetch(`${process.env.BACKEND_URL}/user/register`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
