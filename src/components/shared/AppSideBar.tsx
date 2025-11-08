@@ -1,3 +1,4 @@
+// src/components/modules/AppSidebar.tsx
 'use client'
 
 import {
@@ -13,6 +14,8 @@ import { MessageCircle, User, Shield, LogOut } from 'lucide-react'
 import Link from 'next/link'
 import { CardTitle } from '../ui/card'
 import { Button } from '../ui/button'
+import { logoutUser } from '@/services/auth/logout'
+import { useTransition } from 'react'
 
 const items = [
 	{ title: 'Threads', url: '/', icon: MessageCircle },
@@ -33,13 +36,27 @@ export interface User {
 	updatedAt: string
 }
 
-interface userResponse {
-	success: boolean
-	statusCode: number
-	data: User
+interface AppSidebarProps {
+	user: User | null
 }
 
-export function AppSidebar() {
+export function AppSidebar({ user }: AppSidebarProps) {
+	const [isPending, startTransition] = useTransition()
+
+	const handleLogout = () => {
+		startTransition(async () => {
+			await logoutUser()
+		})
+	}
+
+	// Filter items based on user role
+	const filteredItems = items.filter((item) => {
+		if (item.title === 'Admin Tools') {
+			return user?.role === 'ADMIN'
+		}
+		return true
+	})
+
 	return (
 		<Sidebar className='bg-[#0B1221] text-white w-64 flex flex-col border-r border-gray-800 shadow-lg h-screen'>
 			{/* Header */}
@@ -54,21 +71,21 @@ export function AppSidebar() {
 				<SidebarGroup>
 					<SidebarGroupContent>
 						<SidebarMenu className='space-y-2'>
-							{items.map((item) => {
-								return (
-									<SidebarMenuItem key={item.title}>
-										<SidebarMenuButton asChild>
-											<Link
-												href={item.url}
-												className={`flex items-center space-x-3 p-3 rounded-xl transition-colors font-medium `}
-											>
-												<item.icon className='w-5 h-5' />
-												<span>{item.title}</span>
-											</Link>
-										</SidebarMenuButton>
-									</SidebarMenuItem>
-								)
-							})}
+							{filteredItems.map((item) => (
+								<SidebarMenuItem key={item.title}>
+									<SidebarMenuButton asChild>
+										<Link
+											href={item.url}
+											className={`flex items-center space-x-3 p-3 rounded-xl transition-colors font-medium ${
+												item.color || ''
+											}`}
+										>
+											<item.icon className='w-5 h-5' />
+											<span>{item.title}</span>
+										</Link>
+									</SidebarMenuButton>
+								</SidebarMenuItem>
+							))}
 						</SidebarMenu>
 					</SidebarGroupContent>
 				</SidebarGroup>
@@ -76,22 +93,26 @@ export function AppSidebar() {
 
 			{/* Footer */}
 			<div className='mt-auto p-4 border-t border-gray-800 text-xs text-gray-400'>
-				<p className='font-semibold text-gray-300'>
-					User: <span className='text-white'>Person Name</span>
-				</p>
-				<p className='text-gray-500 truncate mt-1'>
-					Email: <span className='text-gray-400'>example@gmail.com</span>
-				</p>
-				<Button
-					// onClick={handleLogout}
-					variant='ghost'
-					className='w-full mt-3 text-gray-300 hover:text-red-400 flex items-center justify-center gap-2 text-sm'
-				>
-					<LogOut className='w-4 h-4' />
-					Log out
-				</Button>
-
-				{/* <>
+				{user ? (
+					<>
+						<p className='font-semibold text-gray-300'>
+							User: <span className='text-white'>{user.name}</span>
+						</p>
+						<p className='text-gray-500 truncate mt-1'>
+							Email: <span className='text-gray-400'>{user.email}</span>
+						</p>
+						<Button
+							onClick={handleLogout}
+							disabled={isPending}
+							variant='ghost'
+							className='w-full mt-3 text-gray-300 hover:text-red-400 flex items-center justify-center gap-2 text-sm'
+						>
+							<LogOut className='w-4 h-4' />
+							{isPending ? 'Logging out...' : 'Log out'}
+						</Button>
+					</>
+				) : (
+					<>
 						<p>
 							Status: <span className='text-yellow-400'>Not signed in</span>
 						</p>
@@ -102,7 +123,8 @@ export function AppSidebar() {
 						>
 							<Link href='/login'>Login</Link>
 						</Button>
-					</> */}
+					</>
+				)}
 			</div>
 		</Sidebar>
 	)

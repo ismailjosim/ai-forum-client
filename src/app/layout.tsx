@@ -4,6 +4,7 @@ import './globals.css'
 import { Toaster } from 'sonner'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/shared/AppSideBar'
+import { AppSidebarWrapper } from '../components/shared/AppSidebarWrapper'
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -36,8 +37,8 @@ const RootLayout = async ({
 			>
 				<SidebarProvider>
 					{/* Sidebar */}
-					<SidebarTrigger />
-					<AppSidebar />
+
+					<AppSidebarWrapper />
 
 					{/* Main Content */}
 

@@ -45,7 +45,7 @@ export const loginUser = async (
 		}
 
 		// Send to API
-		const res = await fetch('http://localhost:5000/api/v1/auth/login', {
+		const res = await fetch(`${process.env.BACKEND_URL}/auth/login`, {
 			method: 'POST',
 			body: JSON.stringify(validatedFields.data),
 			headers: {
