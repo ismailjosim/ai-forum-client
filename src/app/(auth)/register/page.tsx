@@ -1,5 +1,4 @@
 import Link from 'next/link'
-
 import {
 	Card,
 	CardContent,
@@ -8,8 +7,8 @@ import {
 	CardTitle,
 } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import RegisterForm from '@/components/modules/Auth/RegisterForm'
 import SocialSignup from '@/components/modules/Auth/SocialSignup'
-import RegisterForm from '../../../components/modules/Auth/RegisterForm'
 
 const RegisterPage = () => {
 	return (
@@ -22,21 +21,10 @@ const RegisterPage = () => {
 						</CardTitle>
 					</div>
 					<div>
-						<CardTitle className='text-xl'>
-							Create Your ConverseAi Account
-						</CardTitle>
-						<CardDescription className='mt-1'></CardDescription>
-					</div>
-
-					{/* Google Sign Up Button */}
-					<SocialSignup />
-					{/* Divider */}
-					<div className='flex items-center gap-4'>
-						<Separator className='flex-1' />
-						<span className='text-sm font-medium text-muted-foreground'>
-							OR
-						</span>
-						<Separator className='flex-1' />
+						<CardTitle className='text-xl'>Create Account</CardTitle>
+						<CardDescription className='mt-1'>
+							Sign up to start your conversation journey
+						</CardDescription>
 					</div>
 				</CardHeader>
 
@@ -47,4 +35,5 @@ const RegisterPage = () => {
 		</div>
 	)
 }
+
 export default RegisterPage

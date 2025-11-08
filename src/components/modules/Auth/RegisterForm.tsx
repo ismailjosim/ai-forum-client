@@ -1,158 +1,131 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
+import { useActionState, useState } from 'react'
 import Link from 'next/link'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card'
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from '../../ui/form'
-import { Separator } from '@/components/ui/separator'
-import z from 'zod'
-import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+
 import { registerUser } from '@/services/auth/register'
-
-const registerSchema = z
-	.object({
-		name: z.string().min(2, { message: 'Name must be at least 2 characters' }),
-		email: z
-			.string()
-			.min(1, { message: 'Email is required' })
-			.email({ message: 'Must be a valid email' }),
-		password: z
-			.string()
-			.min(6, { message: 'Password must be at least 6 characters' }),
-		confirmPassword: z
-			.string()
-			.min(6, { message: 'Confirm password must be at least 6 characters' }),
-	})
-	.refine((data) => data.password === data.confirmPassword, {
-		message: 'Passwords do not match',
-		path: ['confirmPassword'],
-	})
-
-export type UserData = {
-	name: string
-	email: string
-	password: string
-}
-type RegisterFormValues = z.infer<typeof registerSchema>
+import { Eye, EyeOff, UserPlus } from 'lucide-react'
+import { Field, FieldDescription, FieldGroup, FieldLabel } from '../../ui/field'
 
 const RegisterForm = () => {
-	const router = useRouter()
+	const [state, formAction, isPending] = useActionState(registerUser, null)
+	const [showPassword, setShowPassword] = useState(false)
+	const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-	const form = useForm<RegisterFormValues>({
-		resolver: zodResolver(registerSchema),
-		defaultValues: {
-			name: '',
-			email: '',
-			password: '',
-			confirmPassword: '',
-		},
-	})
-
-	const handleSubmit = async (data: RegisterFormValues) => {
-		try {
-			const result = await registerUser(data)
-			console.log(result)
-			if (result.success) {
-				router.push('/login')
-			} else {
-				console.error('Registration failed:', result.message)
-			}
-		} catch (error) {
-			console.error('Registration error:', error)
+	const getFieldError = (fieldName: string) => {
+		if (state && state.errors) {
+			const error = state.errors.find((err: any) => err.field === fieldName)
+			return error?.message || null
 		}
+		return null
 	}
 
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-4'>
-				{/* Name */}
-				<FormField
-					control={form.control}
-					name='name'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Name</FormLabel>
-							<FormControl>
-								<Input type='text' placeholder='John Doe' {...field} />
-							</FormControl>
-							<FormMessage className='text-red-500 font-medium' />
-						</FormItem>
+		<form action={formAction}>
+			<FieldGroup>
+				<Field>
+					<FieldLabel htmlFor='name'>Full Name</FieldLabel>
+					<Input name='name' type='text' placeholder='John Doe' />
+					{getFieldError('name') && (
+						<FieldDescription className='text-red-500'>
+							{getFieldError('name')}
+						</FieldDescription>
 					)}
-				/>
+				</Field>
 
-				{/* Email */}
-				<FormField
-					control={form.control}
-					name='email'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Email</FormLabel>
-							<FormControl>
-								<Input type='email' placeholder='you@example.com' {...field} />
-							</FormControl>
-							<FormMessage className='text-red-500 font-medium' />
-						</FormItem>
+				<Field>
+					<FieldLabel htmlFor='email'>Email Address</FieldLabel>
+					<Input name='email' type='email' placeholder='your@email.com' />
+					{getFieldError('email') && (
+						<FieldDescription className='text-red-500'>
+							{getFieldError('email')}
+						</FieldDescription>
 					)}
-				/>
+				</Field>
 
-				{/* Password */}
-				<FormField
-					control={form.control}
-					name='password'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Password</FormLabel>
-							<FormControl>
-								<Input type='password' placeholder='••••••••' {...field} />
-							</FormControl>
-							<FormMessage className='text-red-500 font-medium' />
-						</FormItem>
+				<Field>
+					<FieldLabel htmlFor='password'>Password</FieldLabel>
+					<div className='relative'>
+						<Input
+							name='password'
+							type={showPassword ? 'text' : 'password'}
+							placeholder='••••••••'
+						/>
+						<button
+							type='button'
+							onClick={() => setShowPassword(!showPassword)}
+							className='absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors'
+							aria-label={showPassword ? 'Hide password' : 'Show password'}
+						>
+							{showPassword ? (
+								<EyeOff className='h-5 w-5' />
+							) : (
+								<Eye className='h-5 w-5' />
+							)}
+						</button>
+					</div>
+					{getFieldError('password') && (
+						<FieldDescription className='text-red-500'>
+							{getFieldError('password')}
+						</FieldDescription>
 					)}
-				/>
+				</Field>
 
-				{/* Confirm Password */}
-				<FormField
-					control={form.control}
-					name='confirmPassword'
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Confirm Password</FormLabel>
-							<FormControl>
-								<Input type='password' placeholder='••••••••' {...field} />
-							</FormControl>
-							<FormMessage className='text-red-500 font-medium' />
-						</FormItem>
+				<Field>
+					<FieldLabel htmlFor='confirmPassword'>Confirm Password</FieldLabel>
+					<div className='relative'>
+						<Input
+							name='confirmPassword'
+							type={showConfirmPassword ? 'text' : 'password'}
+							placeholder='••••••••'
+						/>
+						<button
+							type='button'
+							onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+							className='absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors'
+							aria-label={
+								showConfirmPassword ? 'Hide password' : 'Show password'
+							}
+						>
+							{showConfirmPassword ? (
+								<EyeOff className='h-5 w-5' />
+							) : (
+								<Eye className='h-5 w-5' />
+							)}
+						</button>
+					</div>
+					{getFieldError('confirmPassword') && (
+						<FieldDescription className='text-red-500'>
+							{getFieldError('confirmPassword')}
+						</FieldDescription>
 					)}
-				/>
+				</Field>
 
-				<Button type='submit' className='w-full'>
-					Register
-				</Button>
+				{getFieldError('general') && (
+					<FieldDescription className='text-red-500 text-center'>
+						{getFieldError('general')}
+					</FieldDescription>
+				)}
 
-				<div className='text-center text-sm'>
-					Already have an account?{' '}
-					<Link href='/login' className='text-blue-600 hover:underline'>
-						Login
-					</Link>
-				</div>
-			</form>
-		</Form>
+				<Field>
+					<Button type='submit' className='w-full' disabled={isPending}>
+						{isPending ? 'Creating Account...' : 'Create Account'}
+						<UserPlus className='w-4 h-4 ml-2' />
+					</Button>
+
+					<FieldDescription className='text-center'>
+						Already have an account?{' '}
+						<Link href='/login' className='underline-offset-4 hover:underline'>
+							Sign In
+						</Link>
+					</FieldDescription>
+				</Field>
+			</FieldGroup>
+		</form>
 	)
 }
 
