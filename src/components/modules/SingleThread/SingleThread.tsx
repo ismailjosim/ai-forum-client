@@ -17,7 +17,7 @@ interface SingleThreadProps {
 const SingleThread = ({ threadData }: SingleThreadProps) => {
 	const [activeReplyId, setActiveReplyId] = useState<string | null>(null)
 	const { thread, threadPost: comments } = threadData
-
+	console.log(threadData)
 	return (
 		<div className='min-h-screen flex flex-col bg-background text-foreground'>
 			<main className='grow w-full mx-auto pt-6 px-4 comment-scroll-area overflow-y-auto'>
@@ -25,6 +25,7 @@ const SingleThread = ({ threadData }: SingleThreadProps) => {
 					title={thread.title}
 					content={thread.content}
 					author={thread?.author as IAuthorInterface}
+					createdAt={thread?.createdAt}
 				/>
 
 				<section className='w-3/4 mx-auto'>
@@ -37,11 +38,11 @@ const SingleThread = ({ threadData }: SingleThreadProps) => {
 						</span>
 					</div>
 
-					{/* <CommentList
+					<CommentList
 						comments={comments}
 						activeReplyId={activeReplyId}
 						setActiveReplyId={setActiveReplyId}
-					/> */}
+					/>
 
 					<div className='mt-6'>
 						<CommentInput threadId={thread._id} />

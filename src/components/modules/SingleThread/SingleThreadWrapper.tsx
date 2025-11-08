@@ -7,7 +7,6 @@ interface SingleThreadWrapperProps {
 
 export async function SingleThreadWrapper({ id }: SingleThreadWrapperProps) {
 	const result = await getSingleThread(id)
-
 	if (!result.success || !result.data) {
 		return (
 			<div className='min-h-screen flex items-center justify-center'>

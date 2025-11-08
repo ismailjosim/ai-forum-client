@@ -12,6 +12,18 @@ export interface IAuthorInterface {
 	isVerified: boolean
 }
 
+export interface ThreadPost {
+	_id: string
+	thread: string
+	content: string
+	author: string | IAuthorInterface
+	parentPost: string | null
+	likes: string[]
+	createdAt: string
+	updatedAt: string
+	replies: ThreadPost[]
+}
+
 export interface Thread {
 	_id: string
 	title: string
@@ -27,17 +39,6 @@ export interface Thread {
 	postCount: number
 	isSpam: boolean
 	lastActivity: string
-	createdAt: string
-	updatedAt: string
-}
-
-export interface ThreadPost {
-	_id: string
-	thread: string
-	content: string
-	author: IAuthorInterface
-	parentPost: string | null
-	isDeleted: boolean
 	createdAt: string
 	updatedAt: string
 }

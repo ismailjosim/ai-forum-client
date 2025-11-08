@@ -1,7 +1,8 @@
-import CommentItem, { Comment } from './CommentItem'
+import CommentItem from './CommentItem'
+import { ThreadPost } from '@/services/thread/get-single-thread'
 
 interface CommentListProps {
-	comments: Comment[]
+	comments: ThreadPost[]
 	activeReplyId: string | null
 	setActiveReplyId: (id: string | null) => void
 }

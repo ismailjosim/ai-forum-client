@@ -1,132 +1,143 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import { useState } from 'react'
-import { Input } from '@/components/ui/input'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { createPost } from '@/services/post/create-post'
+
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 interface CommentInputProps {
-	parentId?: string
-	onCancel?: () => void
-	session?: any
 	threadId: string
-	onSubmit?: (data: CommentData) => Promise<void> | void
-}
-
-export interface CommentData {
-	content: string
-	author: string
-	thread: string
-	parentPost?: string
+	authorId: string
+	parentId?: string | null
+	onCancel?: () => void
+	onSuccess?: () => void
+	userAvatar?: string
+	userName?: string
 }
 
 const CommentInput = ({
+	threadId,
+	authorId,
 	parentId,
 	onCancel,
-	threadId,
-	onSubmit,
+	onSuccess,
+	userAvatar,
+	userName = 'You',
 }: CommentInputProps) => {
-	const [content, setContent] = useState('')
+	const [comment, setComment] = useState('')
 	const [isSubmitting, setIsSubmitting] = useState(false)
 
+	const router = useRouter()
+
 	const handleSubmit = async () => {
-		if (!content.trim()) return
+		if (!comment.trim()) return
 
-		const commentPayload: CommentData = {
-			content,
-			author: '690b67298a164a65224b83b4',
-			thread: threadId,
-			parentPost: parentId || undefined,
-		}
-
+		setIsSubmitting(true)
 		try {
-			setIsSubmitting(true)
-			console.log('📝 Comment Payload:', commentPayload)
-
-			// If an API call handler is passed from parent, call it
-			if (onSubmit) {
-				await onSubmit(commentPayload)
-			} else {
-				// Otherwise, just log it for now
-				console.log('Comment submitted:', commentPayload)
+			const payload = {
+				content: comment.trim(),
+				author: authorId,
+				thread: threadId,
+				...(parentId && { parentPost: parentId }),
 			}
 
-			setContent('')
-			onCancel?.()
+			const result = await createPost(payload)
+
+			if (result.success) {
+				toast.success(result.message || 'Post created successfully')
+
+				// Reset form
+				setComment('')
+
+				// Call success callback
+				if (onSuccess) {
+					onSuccess()
+				}
+
+				// Refresh the page to show new comment
+				router.refresh()
+
+				// Cancel reply mode if applicable
+				if (onCancel) {
+					onCancel()
+				}
+			} else {
+				toast.error(result.error || 'Failed to create post')
+			}
 		} catch (error) {
-			console.error('Failed to submit comment:', error)
+			console.error('Error submitting comment:', error)
+			toast.error('An unexpected error occurred')
 		} finally {
 			setIsSubmitting(false)
 		}
 	}
 
-	// --- Reply Input (child comment) ---
-	if (parentId) {
-		return (
-			<div className='bg-card border border-border rounded-lg p-3 shadow-sm'>
-				<div className='flex items-start space-x-3'>
-					<img
-						src={'https://placehold.co/36x36/50009c/FFFFFF?text=IJ'}
-						alt='User'
-						className='w-9 h-9 rounded-full object-cover shrink-0'
-					/>
-					<div className='flex-1 space-y-2'>
-						<Input
-							value={content}
-							onChange={(e) => setContent(e.target.value)}
-							placeholder='Write a reply...'
-							className='bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-ring'
-						/>
-						<div className='flex justify-end gap-2'>
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+		// Submit on Ctrl/Cmd + Enter
+		if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+			e.preventDefault()
+			handleSubmit()
+		}
+	}
+
+	// Get user initials for fallback
+	const getUserInitials = (name: string) => {
+		return name
+			.split(' ')
+			.map((n) => n[0])
+			.join('')
+			.toUpperCase()
+			.slice(0, 2)
+	}
+
+	return (
+		<div className='flex items-start space-x-3'>
+			<Avatar className='w-10 h-10 shrink-0'>
+				<AvatarImage src={userAvatar || ''} alt={userName} />
+				<AvatarFallback className='bg-primary text-primary-foreground'>
+					{getUserInitials(userName)}
+				</AvatarFallback>
+			</Avatar>
+
+			<div className='flex-1'>
+				<Textarea
+					placeholder={parentId ? 'Write a reply...' : 'Write a comment...'}
+					value={comment}
+					onChange={(e) => setComment(e.target.value)}
+					onKeyDown={handleKeyDown}
+					className='min-h-[60px] resize-none'
+					disabled={isSubmitting}
+				/>
+				<div className='flex items-center justify-between mt-2'>
+					<p className='text-xs text-muted-foreground'>
+						Press Ctrl+Enter to submit
+					</p>
+					<div className='flex items-center space-x-2'>
+						{onCancel && (
 							<Button
 								variant='ghost'
 								size='sm'
 								onClick={onCancel}
-								className='text-muted-foreground hover:text-foreground'
+								disabled={isSubmitting}
 							>
 								Cancel
 							</Button>
-							<Button
-								size='sm'
-								onClick={handleSubmit}
-								disabled={isSubmitting}
-								className='bg-primary text-primary-foreground hover:bg-primary/90'
-							>
-								{isSubmitting ? 'Sending...' : 'Reply'}
-							</Button>
-						</div>
+						)}
+						<Button
+							size='sm'
+							onClick={handleSubmit}
+							disabled={!comment.trim() || isSubmitting}
+						>
+							{isSubmitting ? 'Posting...' : 'Post'}
+						</Button>
 					</div>
 				</div>
 			</div>
-		)
-	}
-
-	// --- Main Comment Input (bottom fixed) ---
-	return (
-		<footer className='relative bottom-0 bg-card border-t border-border p-3 z-50'>
-			<div className='flex items-center gap-3'>
-				<img
-					src={'https://placehold.co/36x36/50009c/FFFFFF?text=IJ'}
-					alt='User'
-					className='w-9 h-9 rounded-full object-cover shrink-0'
-				/>
-				<Input
-					value={content}
-					onChange={(e) => setContent(e.target.value)}
-					placeholder={`Comment as ${'Guest'}`}
-					className='bg-background border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-ring'
-				/>
-				<Button
-					variant='default'
-					size='lg'
-					onClick={handleSubmit}
-					disabled={isSubmitting}
-					className='text-white shrink-0'
-				>
-					{isSubmitting ? 'Sending...' : 'Send'}
-				</Button>
-			</div>
-		</footer>
+		</div>
 	)
 }
 
