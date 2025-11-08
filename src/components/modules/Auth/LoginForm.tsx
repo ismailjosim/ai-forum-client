@@ -63,7 +63,7 @@ const LoginForm = () => {
 		setIsLoading(true)
 
 		try {
-			const result = await loginUser(data.email, data.password)
+			const result = await loginUser(data)
 
 			if (result.success) {
 				toast.success(result.message || 'Login successful!', {
