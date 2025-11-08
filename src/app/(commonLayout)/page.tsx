@@ -1,11 +1,9 @@
-import { ThreadsList } from '@/components/modules/Threads/ThreadsList'
+import { ThreadsListWrapper } from '@/components/modules/Threads/ThreadsListWrapper'
 
-const ThreadsPage = () => {
+export default function HomePage() {
 	return (
-		<section className='flex-1 overflow-y-auto p-6 md:p-10 bg-gray-50 min-h-screen'>
-			<ThreadsList />
-		</section>
+		<div className='container mx-auto px-4 py-8'>
+			<ThreadsListWrapper />
+		</div>
 	)
 }
-
-export default ThreadsPage

@@ -1,13 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ThreadItem, ThreadItemProps } from './ThreadItem'
 import { ThreadSearchBar } from './ThreadSearchBar'
 import { NewThreadButton } from './NewThreadButton'
 import { Card } from '@/components/ui/card'
 
-// 🧩 Thread interface matching backend response
 export interface IThread {
 	_id: string
 	title: string
@@ -35,50 +33,21 @@ export interface IThread {
 	__v?: number
 }
 
-export function ThreadsList() {
-	const [threads, setThreads] = useState<IThread[]>([])
-	const [loading, setLoading] = useState(true)
-	const [error, setError] = useState<string | null>(null)
+interface ThreadsListProps {
+	initialThreads: IThread[]
+}
 
-	useEffect(() => {
-		const fetchThreads = async () => {
-			try {
-				setLoading(true)
-				const res = await fetch('http://localhost:5000/api/v1/thread', {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					cache: 'no-store',
-				})
+export function ThreadsList({ initialThreads }: ThreadsListProps) {
+	const [threads] = useState<IThread[]>(initialThreads)
+	const [searchQuery, setSearchQuery] = useState('')
 
-				if (!res.ok) throw new Error('Failed to fetch threads')
-
-				const data = await res.json()
-				setThreads(data.data || [])
-			} catch (err: any) {
-				setError(err.message)
-			} finally {
-				setLoading(false)
-			}
-		}
-
-		fetchThreads()
-	}, [])
-
-	if (loading) {
-		return (
-			<div className='flex justify-center items-center py-10'>loading...</div>
-		)
-	}
-
-	if (error) {
-		return (
-			<p className='text-red-600 text-center py-6'>
-				Failed to load threads: {error}
-			</p>
-		)
-	}
+	// Filter threads based on search query
+	const filteredThreads = threads.filter(
+		(thread) =>
+			thread.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			thread.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			thread.category.toLowerCase().includes(searchQuery.toLowerCase()),
+	)
 
 	return (
 		<div className='space-y-8'>
@@ -88,14 +57,14 @@ export function ThreadsList() {
 
 			{/* Search + Button Row */}
 			<Card className='p-6 flex flex-col sm:flex-row justify-between items-center gap-4'>
-				<ThreadSearchBar />
+				<ThreadSearchBar onSearch={setSearchQuery} />
 				<NewThreadButton />
 			</Card>
 
 			{/* Thread Items */}
 			<div className='space-y-4'>
-				{threads.length > 0 ? (
-					threads.map((thread) => {
+				{filteredThreads.length > 0 ? (
+					filteredThreads.map((thread) => {
 						const threadProps: ThreadItemProps = {
 							_id: thread._id,
 							title: thread.title,
@@ -114,7 +83,11 @@ export function ThreadsList() {
 						return <ThreadItem key={thread._id} {...threadProps} />
 					})
 				) : (
-					<p className='text-gray-500 text-center py-6'>No threads found.</p>
+					<p className='text-gray-500 text-center py-6'>
+						{searchQuery
+							? 'No threads match your search.'
+							: 'No threads found.'}
+					</p>
 				)}
 			</div>
 		</div>
