@@ -9,19 +9,18 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import { Home, MessageCircle, User, Shield } from 'lucide-react'
+import { Home, MessageCircle, User, Shield, LogOut } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { CardTitle } from '../ui/card'
+import { Session } from 'next-auth'
+import { Button } from '../ui/button'
+import { signOut } from 'next-auth/react'
 
 const items = [
 	{
-		title: 'Overview',
-		url: '/',
-		icon: Home,
-	},
-	{
 		title: 'Threads',
-		url: '/threads',
+		url: '/',
 		icon: MessageCircle,
 	},
 	{
@@ -37,19 +36,24 @@ const items = [
 	},
 ]
 
-export function AppSidebar() {
+interface NavbarProps {
+	session: Session | null
+}
+
+export function AppSidebar({ session }: NavbarProps) {
 	const pathname = usePathname()
+
+	const handleLogout = async () => {
+		await signOut({ callbackUrl: '/login' })
+	}
 
 	return (
 		<Sidebar className='bg-[#0B1221] text-white w-64 flex flex-col border-r border-gray-800 shadow-lg h-screen'>
 			{/* Header */}
 			<div className='p-6 pb-8'>
-				<h1 className='text-3xl font-extrabold tracking-wider flex items-center space-x-2 text-indigo-400'>
-					<span role='img' aria-label='chat'>
-						💬
-					</span>
-					<span>AI Forum</span>
-				</h1>
+				<div className='flex items-center justify-center space-x-2'>
+					<CardTitle className='text-3xl font-extrabold'>ConverseAi</CardTitle>
+				</div>
 			</div>
 
 			{/* Navigation */}
@@ -84,10 +88,43 @@ export function AppSidebar() {
 
 			{/* Footer */}
 			<div className='mt-auto p-4 border-t border-gray-800 text-xs text-gray-400'>
-				<p>Status: Initializing...</p>
-				<p className='text-gray-500 truncate mt-1'>
-					ID: <span id='user-id-full'>--</span>
-				</p>
+				{session ? (
+					<>
+						<p className='font-semibold text-gray-300'>
+							User:{' '}
+							<span className='text-white'>
+								{session.user?.name || 'Unknown'}
+							</span>
+						</p>
+						<p className='text-gray-500 truncate mt-1'>
+							Email:{' '}
+							<span className='text-gray-400'>
+								{session.user?.email || '--'}
+							</span>
+						</p>
+						<Button
+							onClick={handleLogout}
+							variant='ghost'
+							className='w-full mt-3 text-gray-300 hover:text-red-400 flex items-center justify-center gap-2 text-sm'
+						>
+							<LogOut className='w-4 h-4' />
+							Log out
+						</Button>
+					</>
+				) : (
+					<>
+						<p>
+							Status: <span className='text-yellow-400'>Not signed in</span>
+						</p>
+						<Button
+							asChild
+							variant='outline'
+							className='w-full mt-3 text-sm text-gray-300 border-gray-700 hover:bg-gray-800'
+						>
+							<Link href='/login'>Login</Link>
+						</Button>
+					</>
+				)}
 			</div>
 		</Sidebar>
 	)

@@ -1,3 +1,6 @@
 export { default } from 'next-auth/middleware'
 
-export const config = { matcher: ['/thread'] }
+// Protect all dynamic thread routes like /threads/[slug]
+export const config = {
+	matcher: ['/threads/:path*'],
+}

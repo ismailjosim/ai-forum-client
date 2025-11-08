@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -20,7 +20,7 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
 import { toast } from 'sonner'
-import { loginUser } from '../../../utility/actions/login'
+import { loginUser } from '@/utility/actions/login'
 
 const loginSchema = z.object({
 	email: z.string().email({ message: 'Please enter a valid email address.' }),
@@ -32,6 +32,8 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>
 
 const LoginForm = () => {
+	const searchParams = useSearchParams()
+	const callbackUrl = searchParams.get('callbackUrl') || '/'
 	const router = useRouter()
 	const [error, setError] = useState('')
 	const [isLoading, setIsLoading] = useState(false)
@@ -52,7 +54,7 @@ const LoginForm = () => {
 			if (result.data.accessToken) {
 				// Successful login
 				localStorage.setItem('accessToken', result.data.accessToken)
-				router.push('/')
+				router.push(callbackUrl)
 			} else {
 				console.error('Login failed:', result.message)
 			}

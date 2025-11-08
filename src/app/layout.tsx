@@ -4,6 +4,8 @@ import './globals.css'
 import { Toaster } from 'sonner'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/shared/AppSideBar'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '../utility/authOptions'
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -24,11 +26,12 @@ export const metadata: Metadata = {
 	},
 }
 
-export default function RootLayout({
+const RootLayout = async ({
 	children,
 }: Readonly<{
 	children: React.ReactNode
-}>) {
+}>) => {
+	const session = await getServerSession(authOptions)
 	return (
 		<html lang='en' className='h-full'>
 			<body
@@ -36,7 +39,7 @@ export default function RootLayout({
 			>
 				<SidebarProvider>
 					{/* Sidebar */}
-					<AppSidebar />
+					<AppSidebar session={session} />
 
 					{/* Main Content */}
 
@@ -48,3 +51,4 @@ export default function RootLayout({
 		</html>
 	)
 }
+export default RootLayout

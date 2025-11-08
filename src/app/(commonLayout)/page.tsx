@@ -1,16 +1,11 @@
-import { Overview } from '../../components/modules/Home/Overview'
+import { ThreadsList } from '@/components/modules/Threads/ThreadsList'
 
-const HomePage = () => {
+const ThreadsPage = () => {
 	return (
-		<section>
-			<div>
-				<h2 className='text-3xl md:text-4xl font-extrabold mb-8 text-gray-900'>
-					Platform Status Overview
-				</h2>
-				<Overview />
-			</div>
+		<section className='flex-1 overflow-y-auto p-6 md:p-10 bg-gray-50 min-h-screen'>
+			<ThreadsList />
 		</section>
 	)
 }
 
-export default HomePage
+export default ThreadsPage
