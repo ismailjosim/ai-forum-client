@@ -4,14 +4,14 @@ import { useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { createPost } from '@/services/post/create-post'
+import { createPost, CreatePostPayload } from '@/services/post/create-post'
 
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 interface CommentInputProps {
 	threadId: string
-	authorId: string
+	authorId?: string
 	parentId?: string | null
 	onCancel?: () => void
 	onSuccess?: () => void
@@ -21,7 +21,6 @@ interface CommentInputProps {
 
 const CommentInput = ({
 	threadId,
-	authorId,
 	parentId,
 	onCancel,
 	onSuccess,
@@ -40,28 +39,23 @@ const CommentInput = ({
 		try {
 			const payload = {
 				content: comment.trim(),
-				author: authorId,
 				thread: threadId,
-				...(parentId && { parentPost: parentId }),
+				parentPost: parentId || null,
 			}
 
-			const result = await createPost(payload)
+			const result = await createPost(payload as CreatePostPayload)
 
 			if (result.success) {
 				toast.success(result.message || 'Post created successfully')
 
-				// Reset form
 				setComment('')
 
-				// Call success callback
 				if (onSuccess) {
 					onSuccess()
 				}
 
-				// Refresh the page to show new comment
 				router.refresh()
 
-				// Cancel reply mode if applicable
 				if (onCancel) {
 					onCancel()
 				}

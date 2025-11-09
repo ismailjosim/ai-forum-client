@@ -1,4 +1,10 @@
-import { ThumbsUp, ThumbsDown, Reply } from 'lucide-react'
+import {
+	ThumbsUp,
+	ThumbsDown,
+	Reply,
+	BadgeCheck,
+	CircleCheck,
+} from 'lucide-react'
 import CommentInput from './CommentInput'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { formatDistanceToNow } from 'date-fns'
@@ -37,16 +43,15 @@ const CommentItem = ({
 			.slice(0, 2)
 	}
 
-	// Handle both populated and unpopulated author
-	const authorName =
-		typeof comment.author === 'string'
-			? 'Anonymous'
-			: (comment.author as IAuthorInterface).name || 'Anonymous'
-
-	const authorPicture =
+	// Extract author information with proper type checking
+	const author =
 		typeof comment.author === 'string'
 			? null
-			: (comment.author as IAuthorInterface).picture
+			: (comment.author as IAuthorInterface)
+
+	const authorName = author?.name || 'Anonymous'
+	const authorPicture = author?.picture || undefined
+	const isVerified = author?.isVerified || false
 
 	const timeAgo = formatDistanceToNow(new Date(comment.createdAt), {
 		addSuffix: true,
@@ -57,7 +62,9 @@ const CommentItem = ({
 			<div className='p-4 border-b border-border/50'>
 				<div className='flex items-start space-x-3'>
 					<Avatar className='w-10 h-10 shrink-0'>
-						<AvatarImage src={authorPicture || ''} alt={authorName} />
+						{authorPicture && (
+							<AvatarImage src={authorPicture} alt={authorName} />
+						)}
 						<AvatarFallback className='bg-primary text-primary-foreground'>
 							{getInitials(authorName)}
 						</AvatarFallback>
@@ -65,10 +72,15 @@ const CommentItem = ({
 
 					<div className='flex-1 min-w-0'>
 						<div className='flex items-baseline space-x-2'>
-							<p className='font-semibold text-card-foreground'>{authorName}</p>
+							<div className='flex items-center space-x-1'>
+								<p className='font-semibold text-card-foreground'>
+									{authorName}
+								</p>
+								{isVerified && <BadgeCheck className='text-blue-500' />}
+							</div>
 							<span className='text-xs text-muted-foreground'>{timeAgo}</span>
 						</div>
-						<p className='text-muted-foreground mt-1 break-words'>
+						<p className='text-muted-foreground mt-1 wrap-break-word'>
 							{comment.content}
 						</p>
 

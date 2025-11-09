@@ -17,7 +17,7 @@ interface SingleThreadProps {
 const SingleThread = ({ threadData }: SingleThreadProps) => {
 	const [activeReplyId, setActiveReplyId] = useState<string | null>(null)
 	const { thread, threadPost: comments } = threadData
-	console.log(threadData)
+
 	return (
 		<div className='min-h-screen flex flex-col bg-background text-foreground'>
 			<main className='grow w-full mx-auto pt-6 px-4 comment-scroll-area overflow-y-auto'>

@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// src/services/post/create-post.ts
+
 'use server'
 
 import { cookies } from 'next/headers'
-
+import jwt from 'jsonwebtoken'
 export interface CreatePostPayload {
 	content: string
 	author: string
 	thread: string
-	parentPost?: string | null
+	parentPost: string | null
 }
 
 export interface CreatePostResponse {
@@ -30,6 +30,16 @@ export async function createPost(payload: CreatePostPayload) {
 				data: null,
 			}
 		}
+		const decoded = jwt.verify(
+			accessToken,
+			process.env.JWT_ACCESS_SECRET as string,
+		) as any
+
+		const postPayload = {
+			...payload,
+			author: decoded.userId,
+		}
+		// console.log(postPayload)
 
 		const headers: HeadersInit = {
 			'Content-Type': 'application/json',
@@ -39,7 +49,7 @@ export async function createPost(payload: CreatePostPayload) {
 		const res = await fetch(`${process.env.BACKEND_URL}/post/create-post`, {
 			method: 'POST',
 			headers,
-			body: JSON.stringify(payload),
+			body: JSON.stringify(postPayload),
 			cache: 'no-store',
 		})
 
