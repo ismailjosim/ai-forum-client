@@ -5,6 +5,7 @@ import { Toaster } from 'sonner'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/shared/AppSideBar'
 import { AppSidebarWrapper } from '../components/shared/AppSidebarWrapper'
+import { SocketProvider } from './contexts/SocketContext'
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -33,19 +34,16 @@ const RootLayout = async ({
 	return (
 		<html lang='en' className='h-full'>
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased  min-h-screen flex`}
+				className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex`}
 			>
-				<SidebarProvider>
-					{/* Sidebar */}
+				<SocketProvider>
+					<SidebarProvider>
+						<AppSidebarWrapper />
+						<main className='flex-1 p-6 overflow-y-auto'>{children}</main>
+					</SidebarProvider>
 
-					<AppSidebarWrapper />
-
-					{/* Main Content */}
-
-					<main className='flex-1 p-6 overflow-y-auto'>{children}</main>
-				</SidebarProvider>
-
-				<Toaster richColors position='bottom-right' />
+					<Toaster richColors position='bottom-right' />
+				</SocketProvider>
 			</body>
 		</html>
 	)

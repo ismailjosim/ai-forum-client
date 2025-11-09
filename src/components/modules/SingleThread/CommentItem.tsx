@@ -1,10 +1,4 @@
-import {
-	ThumbsUp,
-	ThumbsDown,
-	Reply,
-	BadgeCheck,
-	CircleCheck,
-} from 'lucide-react'
+import { ThumbsUp, ThumbsDown, Reply, BadgeCheck } from 'lucide-react'
 import CommentInput from './CommentInput'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { formatDistanceToNow } from 'date-fns'
