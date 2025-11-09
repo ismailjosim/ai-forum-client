@@ -2,10 +2,11 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'sonner'
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
-import { AppSidebar } from '@/components/shared/AppSideBar'
-import { AppSidebarWrapper } from '../components/shared/AppSidebarWrapper'
+import { SidebarProvider } from '@/components/ui/sidebar'
+
+import { AppSidebarWrapper } from '@/components/shared/AppSidebarWrapper'
 import { SocketProvider } from './contexts/SocketContext'
+import TopMenu from '@/components/shared/TopMenu'
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',
@@ -39,7 +40,15 @@ const RootLayout = async ({
 				<SocketProvider>
 					<SidebarProvider>
 						<AppSidebarWrapper />
-						<main className='flex-1 p-6 overflow-y-auto'>{children}</main>
+
+						<div className='flex-1 flex flex-col'>
+							{/* Top Navigation Bar */}
+							<header className='bg-slate-900 border-b border-slate-800 px-6 py-3 flex justify-end'>
+								<TopMenu />
+							</header>
+
+							<main className='flex-1 p-6 overflow-y-auto'>{children}</main>
+						</div>
 					</SidebarProvider>
 
 					<Toaster richColors position='bottom-right' />

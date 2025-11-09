@@ -32,7 +32,6 @@ export const createThread = async (data: ThreadData) => {
 			...data,
 			author: decoded.userId,
 		}
-		console.log(threadPayload)
 
 		// Make API call with authorization header
 		const res = await fetch(`${process.env.BACKEND_URL}/thread/create-thread`, {

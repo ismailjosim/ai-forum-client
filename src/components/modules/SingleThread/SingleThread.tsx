@@ -25,35 +25,35 @@ const SingleThread = ({ threadData }: SingleThreadProps) => {
 	useEffect(() => {
 		if (!socket || !isConnected) return // wait until connected
 
-		console.log('🔌 Joining thread room:', thread._id)
+		// console.log('🔌 Joining thread room:', thread._id)
 		socket.emit('join-post', thread._id)
 
 		const handleNewComment = (data: {
 			postId: string
 			comment: IThreadPost
 		}) => {
-			console.log('📨 New comment received:', data)
+			// console.log('📨 New comment received:', data)
 
 			if (data.postId === thread._id) {
 				setComments((prev) => {
 					// Check if comment already exists
 					const exists = prev.some((c) => c._id === data.comment._id)
 					if (exists) {
-						console.log('⚠️ Comment already exists, skipping')
+						// console.log('⚠️ Comment already exists, skipping')
 						return prev
 					}
 
 					// If it's a top-level comment (no parent)
 					if (!data.comment.parentPost) {
-						console.log('✅ Adding top-level comment')
+						// console.log('✅ Adding top-level comment')
 						return [...prev, data.comment]
 					}
 
 					// If it's a reply, find the parent and add to its replies
-					console.log(
-						'✅ Adding nested reply to parent:',
-						data.comment.parentPost,
-					)
+					// console.log(
+					// 	'✅ Adding nested reply to parent:',
+					// 	data.comment.parentPost,
+					// )
 
 					const addReplyToParent = (comments: IThreadPost[]): IThreadPost[] => {
 						return comments.map((comment) => {
@@ -85,7 +85,7 @@ const SingleThread = ({ threadData }: SingleThreadProps) => {
 		socket.on('new-comment', handleNewComment)
 
 		return () => {
-			console.log('👋 Leaving thread room:', thread._id)
+			// console.log('👋 Leaving thread room:', thread._id)
 			socket.emit('leave-post', thread._id)
 			socket.off('new-comment', handleNewComment)
 		}
