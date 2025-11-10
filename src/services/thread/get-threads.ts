@@ -41,7 +41,7 @@ export async function getThreads(page = 1, limit = 5, searchTerm = '') {
 		}
 
 		if (accessToken) {
-			headers['Authorization'] = `Bearer ${accessToken}`
+			headers['Authorization'] = `${accessToken}`
 		}
 
 		const res = await fetch(

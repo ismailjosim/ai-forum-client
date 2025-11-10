@@ -52,12 +52,13 @@ export const createThread = async (data: ThreadData) => {
 		}
 
 		const threadData = await res.json()
-		console.log(threadData)
+
 		return {
 			success: true,
 			data: threadData,
 		}
 	} catch (error: any) {
+		console.log(error)
 		// Allow Next.js redirects to propagate
 		if (error?.digest?.startsWith('NEXT_REDIRECT')) {
 			throw error

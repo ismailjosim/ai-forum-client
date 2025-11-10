@@ -29,12 +29,7 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
 			<FieldGroup>
 				<Field>
 					<FieldLabel htmlFor='email'>Email Address</FieldLabel>
-					<Input
-						defaultValue={'demo@user.com'}
-						name='email'
-						type='email'
-						placeholder='your@email.com'
-					/>
+					<Input name='email' type='email' placeholder='your@email.com' />
 					{getFieldError('email') && (
 						<FieldDescription className='text-red-500'>
 							{getFieldError('email')}
@@ -54,7 +49,6 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
 					</div>
 					<div className='relative'>
 						<Input
-							defaultValue={'12345678Aa@'}
 							name='password'
 							type={showPassword ? 'text' : 'password'}
 							placeholder='••••••••'
