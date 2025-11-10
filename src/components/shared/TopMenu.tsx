@@ -21,8 +21,26 @@ import {
 } from '@/services/notification/notification-service'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import UserProfile from './UserProfile'
 
-const TopMenu = () => {
+export interface User {
+	_id: string
+	name: string
+	email: string
+	picture: string | null
+	role: 'USER' | 'ADMIN' | string
+	isActive: 'ACTIVE' | 'INACTIVE' | string
+	isDeleted: boolean
+	isVerified: boolean
+	createdAt: string
+	updatedAt: string
+}
+
+interface UserProfileProps {
+	user: User | null
+}
+
+const TopMenu = ({ user }: UserProfileProps) => {
 	const [isOpen, setIsOpen] = useState(false)
 	const [notifications, setNotifications] = useState<INotification[]>([])
 	const [unreadCount, setUnreadCount] = useState(0)
@@ -258,11 +276,10 @@ const TopMenu = () => {
 	}
 
 	return (
-		<div className='relative'>
-			{/* Notification Bell Button */}
+		<div className='relative flex items-center gap-5'>
 			<button
 				onClick={() => setIsOpen(!isOpen)}
-				className='relative p-2 rounded-full hover:bg-slate-700/50 transition-colors'
+				className=' p-2 rounded-full hover:bg-slate-700/50 transition-colors'
 				aria-label='Notifications'
 			>
 				<Bell className='w-6 h-6 text-slate-300' />
@@ -290,7 +307,7 @@ const TopMenu = () => {
 					/>
 
 					{/* Dropdown */}
-					<div className='absolute right-0 mt-2 w-96 bg-slate-800 rounded-lg shadow-2xl border border-slate-700 z-50 overflow-hidden'>
+					<div className='absolute top-10 right-0 mt-2 w-96 bg-slate-800 rounded-lg shadow-2xl border border-slate-700 z-50 overflow-hidden'>
 						{/* Header */}
 						<div className='flex items-center justify-between p-4 border-b border-slate-700'>
 							<h3 className='text-lg font-semibold text-slate-100'>
@@ -411,6 +428,10 @@ const TopMenu = () => {
 					</div>
 				</>
 			)}
+
+			<div>
+				<UserProfile user={user} />
+			</div>
 		</div>
 	)
 }
