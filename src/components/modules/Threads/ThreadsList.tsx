@@ -1,53 +1,54 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useState } from 'react'
-import { ThreadItem, ThreadItemProps } from './ThreadItem'
+import { useState, useMemo } from 'react'
+import { Button } from '@/components/ui/button'
+import { getThreads } from '@/services/thread/get-threads'
+import { ThreadItem } from './ThreadItem'
+import { Card } from '../../ui/card'
 import { ThreadSearchBar } from './ThreadSearchBar'
 import { NewThreadButton } from './NewThreadButton'
-import { Card } from '@/components/ui/card'
-
-export interface IThread {
-	_id: string
-	title: string
-	content: string
-	category: string
-	author:
-		| string
-		| {
-				_id: string
-				name?: string
-				email?: string
-				picture?: string | null
-		  }
-	tags: string[]
-	isPinned: boolean
-	isLocked: boolean
-	isClosed: boolean
-	isDeleted: boolean
-	views: number
-	postCount: number
-	isSpam: boolean
-	lastActivity: string
-	createdAt: string
-	updatedAt: string
-	__v?: number
-}
 
 interface ThreadsListProps {
-	initialThreads: IThread[]
+	initialThreads: any[]
+	initialMeta: {
+		page: number
+		limit: number
+		total: number
+		totalPage: number
+	}
 }
 
-export function ThreadsList({ initialThreads }: ThreadsListProps) {
-	const [threads] = useState<IThread[]>(initialThreads)
+export function ThreadsList({ initialThreads, initialMeta }: ThreadsListProps) {
+	const [threads, setThreads] = useState(initialThreads)
+	const [meta, setMeta] = useState(initialMeta)
+	const [page, setPage] = useState(initialMeta.page || 1)
+	const [loading, setLoading] = useState(false)
 	const [searchQuery, setSearchQuery] = useState('')
 
-	// Filter threads based on search query
-	const filteredThreads = threads.filter(
-		(thread) =>
-			thread.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			thread.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			thread.category.toLowerCase().includes(searchQuery.toLowerCase()),
-	)
+	const handlePageChange = async (newPage: number) => {
+		if (newPage < 1 || newPage > meta.totalPage) return
+		setLoading(true)
+
+		const result = await getThreads(newPage, meta.limit)
+		if (result.success) {
+			setThreads(result.data)
+			setMeta(result.meta)
+			setPage(newPage)
+		}
+
+		setLoading(false)
+	}
+
+	// Filter threads by search query (client-side)
+	const filteredThreads = useMemo(() => {
+		if (!searchQuery.trim()) return threads
+		return threads.filter(
+			(t) =>
+				t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				t.content.toLowerCase().includes(searchQuery.toLowerCase()),
+		)
+	}, [searchQuery, threads])
 
 	return (
 		<div className='space-y-8'>
@@ -61,27 +62,33 @@ export function ThreadsList({ initialThreads }: ThreadsListProps) {
 				<NewThreadButton />
 			</Card>
 
-			{/* Thread Items */}
+			{/* Threads List */}
 			<div className='space-y-4'>
-				{filteredThreads.length > 0 ? (
-					filteredThreads.map((thread) => {
-						const threadProps: ThreadItemProps = {
-							_id: thread._id,
-							title: thread.title,
-							category: thread.category,
-							color: 'indigo',
-							description: thread.content,
-							author:
+				{loading ? (
+					<div className='space-y-3'>
+						{[...Array(5)].map((_, i) => (
+							<div key={i} className='h-24 bg-gray-100 rounded animate-pulse' />
+						))}
+					</div>
+				) : filteredThreads.length > 0 ? (
+					filteredThreads.map((thread) => (
+						<ThreadItem
+							key={thread._id}
+							_id={thread._id}
+							title={thread.title}
+							category={thread.category}
+							color='indigo'
+							description={thread.content}
+							author={
 								typeof thread.author === 'string'
 									? 'Anonymous'
-									: thread.author.name || 'Anonymous',
-							replies: thread.postCount || 0,
-							views: String(thread.views || 0),
-							updated: new Date(thread.updatedAt).toLocaleString(),
-						}
-
-						return <ThreadItem key={thread._id} {...threadProps} />
-					})
+									: thread.author?.name || 'Anonymous'
+							}
+							replies={thread.postCount || 0}
+							views={String(thread.views || 0)}
+							updated={new Date(thread.updatedAt).toLocaleString()}
+						/>
+					))
 				) : (
 					<p className='text-gray-500 text-center py-6'>
 						{searchQuery
@@ -89,6 +96,29 @@ export function ThreadsList({ initialThreads }: ThreadsListProps) {
 							: 'No threads found.'}
 					</p>
 				)}
+			</div>
+
+			{/* Pagination Controls */}
+			<div className='flex justify-center items-center gap-2 mt-6'>
+				<Button
+					variant='outline'
+					onClick={() => handlePageChange(page - 1)}
+					disabled={page === 1 || loading}
+				>
+					Previous
+				</Button>
+
+				<span className='text-sm text-gray-700'>
+					Page {meta.page} of {meta.totalPage}
+				</span>
+
+				<Button
+					variant='outline'
+					onClick={() => handlePageChange(page + 1)}
+					disabled={page === meta.totalPage || loading}
+				>
+					Next
+				</Button>
 			</div>
 		</div>
 	)

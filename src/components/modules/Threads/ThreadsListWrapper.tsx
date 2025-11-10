@@ -1,8 +1,9 @@
+// src/components/ThreadsListWrapper.tsx
 import { getThreads } from '@/services/thread/get-threads'
 import { ThreadsList } from './ThreadsList'
 
 export async function ThreadsListWrapper() {
-	const result = await getThreads()
+	const result = await getThreads(1, 5)
 
 	if (!result.success) {
 		return (
@@ -17,5 +18,5 @@ export async function ThreadsListWrapper() {
 		)
 	}
 
-	return <ThreadsList initialThreads={result.data} />
+	return <ThreadsList initialThreads={result.data} initialMeta={result.meta} />
 }

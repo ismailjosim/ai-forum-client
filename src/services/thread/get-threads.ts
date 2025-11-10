@@ -31,7 +31,7 @@ export interface IThread {
 	__v?: number
 }
 
-export async function getThreads() {
+export async function getThreads(page = 1, limit = 5) {
 	try {
 		const cookieStore = await cookies()
 		const accessToken = cookieStore.get('accessToken')?.value
@@ -44,11 +44,14 @@ export async function getThreads() {
 			headers['Authorization'] = `Bearer ${accessToken}`
 		}
 
-		const res = await fetch(`${process.env.BACKEND_URL}/thread`, {
-			method: 'GET',
-			headers,
-			cache: 'no-store',
-		})
+		const res = await fetch(
+			`${process.env.BACKEND_URL}/thread?page=${page}&limit=${limit}`,
+			{
+				method: 'GET',
+				headers,
+				cache: 'no-store',
+			},
+		)
 
 		if (!res.ok) {
 			throw new Error('Failed to fetch threads')
@@ -58,6 +61,7 @@ export async function getThreads() {
 		return {
 			success: true,
 			data: data.data || [],
+			meta: data.meta || {},
 		}
 	} catch (error: any) {
 		console.error('Get threads error:', error)
@@ -65,6 +69,7 @@ export async function getThreads() {
 			success: false,
 			error: error instanceof Error ? error.message : 'Failed to fetch threads',
 			data: [],
+			meta: {},
 		}
 	}
 }

@@ -90,7 +90,7 @@ export function NewThreadButton() {
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button className='w-full sm:w-auto flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white rounded-xl px-6 py-3 shadow-lg'>
+				<Button className='w-full sm:w-auto flex items-center space-x-2 bg-primary hover:bg-secondary-foreground text-white rounded-xl px-6 py-3 shadow-lg'>
 					<Plus className='w-5 h-5' />
 					<span>New Thread</span>
 				</Button>
