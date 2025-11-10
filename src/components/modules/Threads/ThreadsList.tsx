@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { getThreads } from '@/services/thread/get-threads'
 import { ThreadItem } from './ThreadItem'
@@ -26,11 +26,11 @@ export function ThreadsList({ initialThreads, initialMeta }: ThreadsListProps) {
 	const [loading, setLoading] = useState(false)
 	const [searchQuery, setSearchQuery] = useState('')
 
-	const handlePageChange = async (newPage: number) => {
-		if (newPage < 1 || newPage > meta.totalPage) return
+	// Fetch threads from backend when search query or page changes
+	const fetchThreads = async (newPage: number, search: string) => {
 		setLoading(true)
 
-		const result = await getThreads(newPage, meta.limit)
+		const result = await getThreads(newPage, meta.limit, search)
 		if (result.success) {
 			setThreads(result.data)
 			setMeta(result.meta)
@@ -40,15 +40,20 @@ export function ThreadsList({ initialThreads, initialMeta }: ThreadsListProps) {
 		setLoading(false)
 	}
 
-	// Filter threads by search query (client-side)
-	const filteredThreads = useMemo(() => {
-		if (!searchQuery.trim()) return threads
-		return threads.filter(
-			(t) =>
-				t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				t.content.toLowerCase().includes(searchQuery.toLowerCase()),
-		)
-	}, [searchQuery, threads])
+	// Handle search with debouncing
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			// Reset to page 1 when searching
+			fetchThreads(1, searchQuery)
+		}, 500) // 500ms debounce
+
+		return () => clearTimeout(timer)
+	}, [searchQuery])
+
+	const handlePageChange = async (newPage: number) => {
+		if (newPage < 1 || newPage > meta.totalPage) return
+		await fetchThreads(newPage, searchQuery)
+	}
 
 	return (
 		<div className='space-y-8'>
@@ -70,8 +75,8 @@ export function ThreadsList({ initialThreads, initialMeta }: ThreadsListProps) {
 							<div key={i} className='h-24 bg-gray-100 rounded animate-pulse' />
 						))}
 					</div>
-				) : filteredThreads.length > 0 ? (
-					filteredThreads.map((thread) => (
+				) : threads.length > 0 ? (
+					threads.map((thread) => (
 						<ThreadItem
 							key={thread._id}
 							_id={thread._id}

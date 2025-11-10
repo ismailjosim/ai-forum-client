@@ -31,7 +31,7 @@ export interface IThread {
 	__v?: number
 }
 
-export async function getThreads(page = 1, limit = 5) {
+export async function getThreads(page = 1, limit = 5, searchTerm = '') {
 	try {
 		const cookieStore = await cookies()
 		const accessToken = cookieStore.get('accessToken')?.value
@@ -45,7 +45,7 @@ export async function getThreads(page = 1, limit = 5) {
 		}
 
 		const res = await fetch(
-			`${process.env.BACKEND_URL}/thread?page=${page}&limit=${limit}`,
+			`${process.env.BACKEND_URL}/thread?page=${page}&limit=${limit}&searchTerm=${searchTerm}`,
 			{
 				method: 'GET',
 				headers,
