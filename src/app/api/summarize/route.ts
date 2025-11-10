@@ -1,52 +1,32 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { streamText } from 'ai'
-import { NextRequest } from 'next/server'
+import { GoogleGenAI } from '@google/genai'
+import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
 	try {
-		const body = await req.json()
-		console.log('Received request body:', JSON.stringify(body, null, 2))
+		const { content } = await req.json()
 
-		const { messages } = body
-
-		if (!messages || !Array.isArray(messages)) {
-			console.error('Invalid messages format:', messages)
-			return new Response('Messages are required', { status: 400 })
+		if (!content) {
+			return NextResponse.json(
+				{ error: 'Content is required' },
+				{ status: 400 },
+			)
 		}
 
-		const formattedMessages = messages.map((msg: any) => {
-			const textContent =
-				msg.parts
-					?.filter((part: any) => part.type === 'text')
-					.map((part: any) => part.text)
-					.join('\n') || ''
-
-			return {
-				role: msg.role,
-				content: textContent,
-			}
+		const ai = new GoogleGenAI({
+			apiKey: process.env.GOOGLE_AI_API_KEY,
 		})
 
-		console.log(
-			'Formatted messages:',
-			JSON.stringify(formattedMessages, null, 2),
-		)
-
-		const result = streamText({
-			model: 'openai/gpt-4o-mini',
-			messages: formattedMessages,
+		const response = await ai.models.generateContent({
+			model: 'gemini-2.5-flash',
+			contents: `Please provide a concise summary of the following content in 2-3 sentences:\n\n${content}`,
 		})
 
-		// Return the streaming response
-		return result.toTextStreamResponse()
+		return NextResponse.json({ summary: response.text })
 	} catch (error) {
-		console.error('Error in chat route:', error)
-		return new Response(
-			JSON.stringify({
-				error: 'Failed to generate response',
-				details: String(error),
-			}),
-			{ status: 500, headers: { 'Content-Type': 'application/json' } },
+		console.error('Error generating summary:', error)
+		return NextResponse.json(
+			{ error: 'Failed to generate summary' },
+			{ status: 500 },
 		)
 	}
 }

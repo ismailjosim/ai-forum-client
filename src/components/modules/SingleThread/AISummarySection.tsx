@@ -1,11 +1,9 @@
 'use client'
 
-import { useChat } from '@ai-sdk/react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Sparkles, Loader2 } from 'lucide-react'
-import { DefaultChatTransport } from 'ai'
 
 interface AISummarySectionProps {
 	content: string
@@ -14,37 +12,48 @@ interface AISummarySectionProps {
 
 const AISummarySection = ({ content }: AISummarySectionProps) => {
 	const [isVisible, setIsVisible] = useState(false)
-
-	const { messages, sendMessage, status } = useChat({
-		transport: new DefaultChatTransport({
-			api: '/api/summarize',
-		}),
-	})
+	const [summary, setSummary] = useState('')
+	const [isLoading, setIsLoading] = useState(false)
+	const [error, setError] = useState<string | null>(null)
 
 	const generateSummary = async () => {
-		if (isVisible && messages.length > 0) {
+		if (isVisible && summary) {
 			setIsVisible(false)
 			return
 		}
+		if (summary && !isVisible) {
+			setIsVisible(true)
+			return
+		}
 
-		const result = await sendMessage({
-			text: `Please provide a concise summary of the following content in 2-3 sentences:\n\n${content}`,
-		})
-		console.log(result)
-		setIsVisible(true)
+		setIsLoading(true)
+		setError(null)
+
+		try {
+			const response = await fetch('/api/summarize', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ content }),
+			})
+
+			const data = await response.json()
+
+			if (!response.ok) {
+				throw new Error(data.error || 'Failed to generate summary')
+			}
+
+			setSummary(data.summary)
+			setIsVisible(true)
+		} catch (err) {
+			setError(
+				err instanceof Error ? err.message : 'Failed to generate summary',
+			)
+		} finally {
+			setIsLoading(false)
+		}
 	}
-
-	const isLoading = status === 'submitted' || status === 'streaming'
-
-	// Get the last AI message as the summary
-	const lastMessage = messages[messages.length - 1]
-	const summary =
-		lastMessage?.role === 'assistant'
-			? lastMessage.parts
-					.filter((part) => part.type === 'text')
-					.map((part) => part.text)
-					.join('')
-			: ''
 
 	return (
 		<div className='w-3/4 mx-auto my-5'>
@@ -88,11 +97,9 @@ const AISummarySection = ({ content }: AISummarySectionProps) => {
 				</div>
 
 				{/* Error Message */}
-				{status === 'error' && (
+				{error && (
 					<div className='mt-4 p-3 bg-red-50 border border-red-200 rounded-lg'>
-						<p className='text-sm text-red-600'>
-							Failed to generate summary. Please try again.
-						</p>
+						<p className='text-sm text-red-600'>{error}</p>
 					</div>
 				)}
 			</Card>
